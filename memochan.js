@@ -3626,6 +3626,13 @@
             charName = getCharacterName();
           }
 
+          /**
+           * 组合用户名与角色名用于展示
+           * @returns {string} 例如 "Alice & Bob"
+           */
+          const userName = (typeof getUserName === 'function') ? getUserName() : 'User';
+          const displayName = `${userName} & ${charName}`;
+
           // 拍立得效果的简单实现
           const polaroidWidth = 110;  // 拍立得宽度
           const polaroidHeight = 165; // 拍立得高度
@@ -3717,7 +3724,7 @@
               ctx.font = `bold 14px "${customFont}", sans-serif`;
               ctx.fillStyle = '#333333';
               ctx.textAlign = 'center';
-              ctx.fillText(charName, polaroidX + polaroidWidth/2, polaroidY + photoHeight + whiteBorder + 15);
+              ctx.fillText(displayName, polaroidX + polaroidWidth/2, polaroidY + photoHeight + whiteBorder + 15);
               
               // 恢复状态
               ctx.restore();
@@ -3731,7 +3738,7 @@
               ctx.font = `bold 14px "${customFont}", sans-serif`;
               ctx.fillStyle = '#333333';
               ctx.textAlign = 'center';
-              ctx.fillText(charName, polaroidX + polaroidWidth/2, polaroidY + photoHeight + whiteBorder + 15);
+              ctx.fillText(displayName, polaroidX + polaroidWidth/2, polaroidY + photoHeight + whiteBorder + 15);
               
               // 恢复状态
               ctx.restore();
@@ -3745,7 +3752,7 @@
             ctx.font = `bold 14px "${customFont}", sans-serif`;
             ctx.fillStyle = '#333333';
             ctx.textAlign = 'center';
-            ctx.fillText(charName, polaroidX + polaroidWidth/2, polaroidY + photoHeight + whiteBorder + 15);
+            ctx.fillText(displayName, polaroidX + polaroidWidth/2, polaroidY + photoHeight + whiteBorder + 15);
             
             // 恢复状态
             ctx.restore();
