@@ -3926,19 +3926,19 @@
         // 更新当前Y坐标，为其他内容留出空间
         currentY += showCharacterPhoto ? 170 : 0; // 与拍立得高度一致
         
-      // 0.5. 绘制楼层信息（如果有的话）
-if (memo.floorLabel && memo.floorLabel !== '手动创建') {
-  ctx.font = `11px "${customFont}", serif`;
-  ctx.fillStyle = theme.colors.userInfo;
-  ctx.textAlign = 'right';
-  // 修复楼层信息的Y坐标：当显示拍立得时在拍立得区域，不显示时在顶部区域
-  const floorY = showCharacterPhoto ? currentY - 100 : currentY - 30;
-// 从memo的context信息中提取聊天名
-let chatName = null;
-if (memo.contextFromStorage) {
-  const contextParts = memo.contextFromStorage.split('-');
-  chatName = contextParts.length >= 2 ? contextParts.slice(1).join('-').trim() : null;
-}
+        // 0.5. 绘制楼层信息（如果有的话）
+        if (memo.floorLabel && memo.floorLabel !== '手动创建') {
+          ctx.font = `11px "${customFont}", serif`;
+          ctx.fillStyle = theme.colors.userInfo;
+          ctx.textAlign = 'right';
+          // 修复楼层信息的Y坐标：当显示拍立得时在拍立得区域，不显示时在顶部区域
+          const floorY = showCharacterPhoto ? currentY - 100 : currentY - 30;
+          // 从memo的context信息中提取聊天名
+          let chatName = null;
+          if (memo.contextFromStorage) {
+            const contextParts = memo.contextFromStorage.split('-');
+            chatName = contextParts.length >= 2 ? contextParts.slice(1).join('-').trim() : null;
+          }
 const floorText = chatName ? 
   `来自 ${chatName} - ${memo.floorLabel}` : 
   `来自 ${memo.floorLabel}`;
@@ -5764,10 +5764,33 @@ regenerateImageWithNewSettings(memo, newStyle, state.fontConfig.currentFont, pre
       filename
     };
   
+    // 调试信息：保存配置前的检查
+    console.log('准备保存GitHub配置:', config);
+    console.log('当前localStorage可用空间检查...');
+    console.log('localStorage可用性:', typeof(Storage) !== "undefined");
+    try {
+      const currentSize = JSON.stringify(localStorage).length;
+      console.log('当前localStorage使用大小:', currentSize, '字符');
+    } catch (e) {
+      console.log('无法计算localStorage大小:', e);
+    }
+
     if (saveGitHubConfig(config)) {
+      console.log('GitHub配置保存成功');
       toastr.success('GitHub设置已保存');
       renderMemoList();
     } else {
+      console.error('GitHub配置保存失败 - 详细调试信息:');
+      console.log('尝试保存的配置对象:', config);
+      console.log('localStorage可用性:', typeof(Storage) !== "undefined");
+      try {
+        const testKey = 'debug_test_' + Date.now();
+        localStorage.setItem(testKey, 'test');
+        localStorage.removeItem(testKey);
+        console.log('localStorage基本读写功能正常');
+      } catch (testError) {
+        console.error('localStorage基本功能测试失败:', testError);
+      }
       toastr.error('保存设置失败');
     }
   }
@@ -5801,7 +5824,19 @@ regenerateImageWithNewSettings(memo, newStyle, state.fontConfig.currentFont, pre
       filename
     };
   
+    // 调试信息：保存配置前的检查
+    console.log('准备保存GitHub配置:', config);
+    console.log('当前localStorage可用空间检查...');
+    console.log('localStorage可用性:', typeof(Storage) !== "undefined");
+    try {
+      const currentSize = JSON.stringify(localStorage).length;
+      console.log('当前localStorage使用大小:', currentSize, '字符');
+    } catch (e) {
+      console.log('无法计算localStorage大小:', e);
+    }
+
     if (saveGitHubConfig(config)) {
+      console.log('GitHub配置保存成功');
       // 显示同步状态区域
       const statusElem = MemoDoc.getElementById('githubSyncStatus');
       if (statusElem) {
@@ -5816,6 +5851,17 @@ regenerateImageWithNewSettings(memo, newStyle, state.fontConfig.currentFont, pre
         downloadFromGitHub(statusElem);
       }
     } else {
+      console.error('GitHub配置保存失败 - 详细调试信息:');
+      console.log('尝试保存的配置对象:', config);
+      console.log('localStorage可用性:', typeof(Storage) !== "undefined");
+      try {
+        const testKey = 'debug_test_' + Date.now();
+        localStorage.setItem(testKey, 'test');
+        localStorage.removeItem(testKey);
+        console.log('localStorage基本读写功能正常');
+      } catch (testError) {
+        console.error('localStorage基本功能测试失败:', testError);
+      }
       toastr.error('保存设置失败');
     }
   }
