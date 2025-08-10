@@ -3955,21 +3955,46 @@ const floorText = chatName ?
         currentY += 25;
 
         /**
-         * 绘制用户名与角色名（移动到标题区域）
-         * 使用与"摘录"相同的字体族，字号更大、字重更重
+         * 绘制用户名与角色名（小字体 + 底色背景）
+         * 与标题区分开来
          */
         ctx.textAlign = 'left';
-        ctx.font = `bold 22px "${customFont}", serif`;
-        ctx.fillStyle = theme.colors.title;
+        ctx.font = `500 12px "${customFont}", serif`; // 字体改小，字重减轻
+        
+        // 先测量文本尺寸以绘制背景
         const displayNameLines = wrapText(ctx, displayNameText, contentWidth);
+        const lineHeight = 16; // 减小行高
+        const backgroundPadding = 4; // 减小边距
+        const backgroundHeight = displayNameLines.length * lineHeight + backgroundPadding * 2;
+        
+        // 计算实际文本的最大宽度
+        let maxTextWidth = 0;
         displayNameLines.forEach(line => {
-          if (line.trim() === '') {
-            currentY += 28;
-          } else {
-            ctx.fillText(line, padding, currentY);
-            currentY += 28;
+          const textWidth = ctx.measureText(line).width;
+          if (textWidth > maxTextWidth) {
+            maxTextWidth = textWidth;
           }
         });
+        
+        // 绘制半透明底色背景（根据实际文字紧贴）
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(padding, currentY - 2, // 左边不要额外边距，上边距减少
+                     maxTextWidth + backgroundPadding, backgroundHeight - 4); // 右边距减少，高度减少
+        ctx.restore();
+        
+        // 绘制文本（使用较浅的颜色）
+        ctx.fillStyle = theme.colors.userInfo || 'rgba(255, 255, 255, 0.7)'; // 使用userInfo颜色或浅色
+        displayNameLines.forEach(line => {
+          if (line.trim() === '') {
+            currentY += lineHeight;
+          } else {
+            ctx.fillText(line, padding, currentY);
+            currentY += lineHeight;
+          }
+        });
+        
+        currentY += backgroundPadding; // 底部边距
         currentY += 10;
 
         // 2. 绘制标题（如果有）
