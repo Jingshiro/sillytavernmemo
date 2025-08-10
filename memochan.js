@@ -2936,6 +2936,11 @@
       currentChatContext = getCurrentChatContext();
       let memos = loadMemosFromStorage(currentChatContext);
       let memo = memos.find(m => m.id === memoId);
+
+      // 如果在当前context中找到memo，也添加context信息
+      if (memo) {
+        memo.contextFromStorage = currentChatContext;
+      }
   
       // 如果在当前上下文中找不到，尝试在所有上下文中查找
       if (!memo) {
@@ -2950,6 +2955,9 @@
                 const foundMemo = contextMemos.find(m => m.id === memoId);
                 if (foundMemo) {
                   memo = foundMemo;
+                  // 从键名中提取context信息
+                  const contextFromKey = key.replace(LOCAL_STORAGE_KEY_PREFIX, '');
+                  memo.contextFromStorage = contextFromKey; // 临时添加context信息
                   console.log('在其他上下文找到Memo:', key);
                   break;
                 }
@@ -3918,12 +3926,23 @@
         // 更新当前Y坐标，为其他内容留出空间
         currentY += showCharacterPhoto ? 170 : 0; // 与拍立得高度一致
         
-        // 0.5. 绘制楼层信息（如果有的话）
-        if (memo.floorLabel && memo.floorLabel !== '手动创建') {
-          ctx.font = `11px "${customFont}", serif`;
-          ctx.fillStyle = theme.colors.userInfo;
-          ctx.textAlign = 'right';
-          ctx.fillText(`来自 ${memo.floorLabel}`, width - padding, currentY - 100);
+      // 0.5. 绘制楼层信息（如果有的话）
+if (memo.floorLabel && memo.floorLabel !== '手动创建') {
+  ctx.font = `11px "${customFont}", serif`;
+  ctx.fillStyle = theme.colors.userInfo;
+  ctx.textAlign = 'right';
+  // 修复楼层信息的Y坐标：当显示拍立得时在拍立得区域，不显示时在顶部区域
+  const floorY = showCharacterPhoto ? currentY - 100 : currentY - 30;
+// 从memo的context信息中提取聊天名
+let chatName = null;
+if (memo.contextFromStorage) {
+  const contextParts = memo.contextFromStorage.split('-');
+  chatName = contextParts.length >= 2 ? contextParts.slice(1).join('-').trim() : null;
+}
+const floorText = chatName ? 
+  `来自 ${chatName} - ${memo.floorLabel}` : 
+  `来自 ${memo.floorLabel}`;
+  ctx.fillText(floorText, width - padding, floorY);
         }
 
         // 1. 绘制时间
